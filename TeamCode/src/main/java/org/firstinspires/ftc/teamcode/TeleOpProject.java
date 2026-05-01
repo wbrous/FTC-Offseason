@@ -21,6 +21,9 @@ public class TeleOpProject extends LinearOpMode {
 
     // Extra Motors
     DcMotor intake;
+    boolean intakeOn = false;
+    boolean lastA = false; // debouncing
+
     Servo hood;
 
     PDF flywheelController;
@@ -46,7 +49,41 @@ public class TeleOpProject extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            // Main loop code goes here
+            /* Section 1: Mecanum Drive */
+            double y = -gamepad1.left_stick_y; // negative because y-stick is reversed
+            double x = gamepad1.left_stick_x;
+            double rx = gamepad1.right_stick_x;
+
+            double frontLeftPower = y + x + rx;
+            double backLeftPower = y - x + rx;
+            double frontRightPower = y - x - rx;
+            double backRightPower = y + x - rx;
+
+            // Denominator is the largest motor power (absolute value) or 1.0.
+            // This scales all motor powers down proportionally so they stay
+            // between -1 and 1 while maintaining the robot's intended direction.
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0);
+            frontLeftPower /= denominator;
+            backLeftPower /= denominator;
+            frontRightPower /= denominator;
+            backRightPower /= denominator;
+
+            frontLeft.setPower(frontLeftPower);
+            backLeft.setPower(backLeftPower);
+            frontRight.setPower(frontRightPower);
+            backRight.setPower(backRightPower);
+
+            /* Section 2: Intake Toggle using A button */
+            if (gamepad1.a && !lastA) {
+                intakeOn = !intakeOn;
+            }
+            lastA = gamepad1.a;
+
+            if (intakeOn) {
+                intake.setPower(1.0);
+            } else {
+                intake.setPower(0.0);
+            }
         }
     }
 }
