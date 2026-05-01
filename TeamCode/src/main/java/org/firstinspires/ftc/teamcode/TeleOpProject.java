@@ -18,6 +18,7 @@ public class TeleOpProject extends LinearOpMode {
 
     // i don't even know what this one does :sob:
     DcMotorEx launchLeft;
+    DcMotorEx launchRight;
 
     // Extra Motors
     DcMotor intake;
@@ -84,6 +85,19 @@ public class TeleOpProject extends LinearOpMode {
             } else {
                 intake.setPower(0.0);
             }
+
+            /* Section 3: Hood Servo */
+            double joystickValue = gamepad1.right_stick_y;
+
+            // max .55 min .35 middle .45
+            double scaledHoodPosition = .45 - (joystickValue * .1);
+            hood.setPosition(scaledHoodPosition);
+
+            /* Section 4: Flywheel PDF Control */
+            double currentVelocity = launchLeft.getVelocity();
+            double power = flywheelController.calc(2000, currentVelocity);
+
+            launchLeft.setPower(power);
         }
     }
 }
