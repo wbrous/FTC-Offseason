@@ -18,7 +18,6 @@ public class TeleOpProject extends LinearOpMode {
 
     // i don't even know what this one does :sob:
     DcMotorEx launchLeft;
-    DcMotorEx launchRight;
 
     // Extra Motors
     DcMotor intake;
@@ -33,17 +32,17 @@ public class TeleOpProject extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // movement motors
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        backLeft   = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight  = hardwareMap.get(DcMotor.class, "backRight");
 
         launchLeft = hardwareMap.get(DcMotorEx.class, "launchLeft");
         launchLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // extra motors
         intake = hardwareMap.get(DcMotor.class, "intake");
-        hood = hardwareMap.get(Servo.class, "hood");
+        hood   = hardwareMap.get(Servo.class, "hood");
 
         flywheelController = new PDF(0, 0, 0);
 
@@ -51,23 +50,23 @@ public class TeleOpProject extends LinearOpMode {
 
         while (opModeIsActive()) {
             /* Section 1: Mecanum Drive */
-            double y = -gamepad1.left_stick_y; // negative because y-stick is reversed
-            double x = gamepad1.left_stick_x;
+            double y  = -gamepad1.left_stick_y; // negative because y-stick is reversed
+            double x  = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
 
-            double frontLeftPower = y + x + rx;
-            double backLeftPower = y - x + rx;
+            double frontLeftPower  = y + x + rx;
+            double backLeftPower   = y - x + rx;
             double frontRightPower = y - x - rx;
-            double backRightPower = y + x - rx;
+            double backRightPower  = y + x - rx;
 
             // Denominator is the largest motor power (absolute value) or 1.0.
             // This scales all motor powers down proportionally so they stay
             // between -1 and 1 while maintaining the robot's intended direction.
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0);
-            frontLeftPower /= denominator;
-            backLeftPower /= denominator;
-            frontRightPower /= denominator;
-            backRightPower /= denominator;
+            frontLeftPower    /= denominator;
+            backLeftPower     /= denominator;
+            frontRightPower   /= denominator;
+            backRightPower    /= denominator;
 
             frontLeft.setPower(frontLeftPower);
             backLeft.setPower(backLeftPower);
@@ -95,7 +94,7 @@ public class TeleOpProject extends LinearOpMode {
 
             /* Section 4: Flywheel PDF Control */
             double currentVelocity = launchLeft.getVelocity();
-            double power = flywheelController.calc(2000, currentVelocity);
+            double power           = flywheelController.calc(2000, currentVelocity);
 
             launchLeft.setPower(power);
         }
